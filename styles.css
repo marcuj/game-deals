@@ -1,0 +1,63 @@
+/*
+  Name: Marcus Jundt
+  Date: 4/24/2024
+  Section: CSE 154 AE
+
+  This is the styles.css page for 
+*/
+
+body {
+  background-color: #121212;
+  color: #FFFFFF;
+  font-family: "Roboto", sans-serif;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+main {
+  width: 80%;
+}
+
+header, #results {
+  box-shadow: #00000065 0px 0px 80px;
+  background-color: #212121;
+}
+
+h1 {
+  text-shadow: #000000 14px 10px 30px;
+}
+
+header {
+  text-align: center;
+  padding: 30px;
+}
+
+a {
+  color: #DEDEDE;
+}
+
+nav > a {
+  padding: 15px;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+button:hover {
+  background-color: #303030;
+}
+
+#results {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+#btn-search {
+  height: 22px;
+  width: 22px;
+  position: relative;
+  bottom: 10px;
+  left: 10px;
+  border: none;
+  background-color: transparent;
+}
