@@ -34,16 +34,6 @@ header {
   padding: 30px;
 }
 
-a {
-  color: #DEDEDE;
-}
-
-nav > a {
-  padding: 15px;
-  text-decoration: none;
-  color: #FFFFFF;
-}
-
 img {
   width: 200px;
   max-height: 100px;
