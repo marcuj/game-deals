@@ -20,16 +20,21 @@
   "WinGameStore", "FunStockDigital", "GameBillet", "Voidu", "Epic Games Store", "Razer Game Store",
   "Gamesplanet", "Gamesload", "2Game", "IndieGala", "Blizzard Shop", "AllYouPlay", "DLGamer",
   "Noctre", "DreamGame"];
+  const GOOD_TH = 75;
+  const OK_TH = 55;
+  
+  // "magic number"
+  const HUN = 100;
 
   window.addEventListener("load", init);
 
-  /** 
+  /**
    * Initializes the buttons for seeing the best deals, and for initiating search based on given
    * query in the search box.
    */
   function init() {
     let searchBtn = id("btn-search");
-    searchBtn.addEventListener("click", (evt) => fetchGames(false, 0, evt)); 
+    searchBtn.addEventListener("click", (evt) => fetchGames(false, 0, evt));
 
     let seeAllBtn = id("btn-see-all");
     seeAllBtn.addEventListener("click", () => fetchGames(true, 0));
@@ -97,7 +102,7 @@
    * Creates an HTML element that contains all the details about the given game and adds
    * it to the results container. Includes thumbnal, title, percent of positive ratings,
    * store which the deal exists, discount percentage, retail price, and sale price.
-   * @param {Object} gameInfo - JSON object of game info from Cheap Shark API
+   * @param {Object} gameJson - JSON object of game info from Cheap Shark API
    */
   function addResultRow(gameJson) {
     let gameInfo = gameJson.gameInfo;
@@ -170,9 +175,9 @@
       ratingEl.classList.add("grey-text");
     } else {
       ratingEl.textContent = ratingValue + "% positive ratings";
-      if (ratingValue >= 75) {
+      if (ratingValue >= GOOD_TH) {
         ratingEl.classList.add("blue-text");
-      } else if (ratingValue >= 55) {
+      } else if (ratingValue >= OK_TH) {
         ratingEl.classList.add("yellow-text");
       } else {
         ratingEl.classList.add("red-text");
@@ -190,7 +195,7 @@
     let retailPrice = Number(gameInfo.retailPrice);
     let salePrice = Number(gameInfo.salePrice);
     let discountEl = gen("p");
-    let percent = 100 - Math.round((salePrice / retailPrice) * 100);
+    let percent = HUN - Math.round((salePrice / retailPrice) * HUN);
     discountEl.textContent = "- " + percent + "%";
     discountEl.classList.add("discount-text");
     return discountEl;
@@ -225,10 +230,10 @@
     errorEl.classList.add("error");
     id("results").appendChild(errorEl);
   }
-  
-  /** 
+
+  /**
    * Checks if the given API reponse's status is OK.
-   * Throws error if not OK and doesn't return the response - took from Lecture 14 slides 
+   * Throws error if not OK and doesn't return the response - took from Lecture 14 slides
    * @param {Promise} response - API response (if response is ok)
    */
   async function statusCheck(response) {
