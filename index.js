@@ -8,67 +8,162 @@
 
 "use strict";
 (function() {
-  const CHEAP_SHARK_URL = "";
+  const CHEAP_SHARK_URL = "https://www.cheapshark.com/api/1.0/";
+
+  const STORES = ["Steam", "GamersGate", "GreenManGaming", "Amazon", "GameStop", "Direct2Drive",
+  "GOG", "Origin", "Get Games", "Shiny Loot", "Humble Store", "Desura", "IndieGameStand",
+  "Fanatical", "Gamesrocket", "Games Republic", "SilaGames", "Playfield", "ImperialGames",
+  "WinGameStore", "FunStockDigital", "GameBillet", "Voidu", "Epic Games Store", "Razer Game Store",
+  "Gamesplanet", "Gamesload", "2Game", "IndieGala", "Blizzard Shop", "AllYouPlay", "DLGamer",
+  "Noctre", "DreamGame"];
+
+  const JSON = {"gameInfo":{"storeID":"21","gameID":"93503","name":"BioShock Infinite",
+  "steamAppID":"8870","salePrice":"5.99","retailPrice":"29.99","steamRatingText":"Very Positive",
+  "steamRatingPercent":"93","steamRatingCount":"101749","metacriticScore":"94",
+  "metacriticLink":"\/game\/bioshock-infinite\/","releaseDate":1364169600,"publisher":"N\/A",
+  "steamworks":"1","thumb":"https:\/\/cdn.cloudflare.steamstatic.com\/steam\/apps\/8870\/capsule_sm_120.jpg?t=1602794480"},
+  "cheaperStores":[],"cheapestPrice":{"price":"3.79","date":1703265375}};
 
   window.addEventListener("load", init);
 
   /** Initializes h fhjvjdfbjh */
   function init() {
     
-    let searchBtn = id("search-btn");
-    searchBtn.addEventListenter("click", searchTitles);
+    let searchBtn = id("btn-search");
+    searchBtn.addEventListener("click", fetchGames); 
 
     let seeAllBtn = id("btn-see-all");
-    seeAllBtn.addEventListener("click", displayAllDeals);
+    seeAllBtn.addEventListener("click", fetchAllDeals); // () => addResultRow(JSON) TEMP TEST CAHNGE TO fetchAllDeals
 
   }
 
-  function searchTitles(evt) {
-    let barEl = evt.target.parentNode.firstElementChild; // ? :D
-    let query = barEl.value;
+  async function fetchGames(evt) {
+    try {
+      id("results").classList.remove("hidden");
+      id("results").innerHTML = "";
 
-  }
+      let barEl = evt.target.parentNode.firstElementChild; // ? :D
+      let query = barEl.value;
 
-  function displayAllDeals() {
+      let response = await fetch(CHEAP_SHARK_URL + "games?title=" + query);
+      await statusCheck(response);
+      let gameList = await response.json();
 
-  }
-
-  function createBoard() {
-    let board = id("board");
-    let boardSize = STAN_SIZE;
-    let isEasy = isEasyDiff();
-    if (isEasy) {
-      boardSize = EASY_SIZE;
-    }
-    for (let i = 0; i < boardSize; i++) {
-      let card = generateUniqueCard(isEasy);
-      board.appendChild(card);
+      for (let i = 0; i < gameList.length; i++) {
+        let gameJson = await fetchGameInfo(gameList[i].cheapestDealID);
+        addResultRow(gameJson);
+      }
+    } catch (err) {
+      displayError();
     }
   }
 
-  /** Deletes the board by removing the innerHTML of the board DOM element */
-  function deleteBoard() {
-    let board = id("board");
-    board.innerHTML = "";
+  async function fetchGameInfo(dealID) {
+    try {
+      let response = await fetch(CHEAP_SHARK_URL + "deals?id=" + dealID);
+      await statusCheck(response);
+      let gameJson = await response.json();
+      return gameJson;
+    } catch (err) {
+      displayError();
+    }
   }
 
-  function generateUniqueCard(isEasy) {
-    let attributes;
-    let cardID;
-    let imgFile;
+  function addResultRow(gameJson) {
+    //TEMP REMOVE THESE!!!!!!!!!!!!!
+    // id("results").classList.remove("hidden");
+    // id("results").innerHTML = "";
+    let gameInfo = gameJson.gameInfo;
 
-    let count = attributes[attributes.length - 1];
-    let cardElement = gen("div");
-    let imgElement = gen("img");
-    cardElement.classList.add("card");
-    cardElement.id = cardID;
-    imgElement.src = imgFile;
-    imgElement.alt = cardID;
-    for (let i = 0; i < count; i++) {
-      cardElement.appendChild(imgElement.cloneNode(true));
+    let rowEl = gen("article");
+    rowEl.classList.add("row");
+
+    let imgEl = gen("img");
+    imgEl.src = gameInfo.thumb;
+    imgEl.alt = gameInfo.name;
+
+    let infoEl = gen("div");
+    infoEl.classList.add("info");
+    
+    let titleEl = gen("h2");
+    titleEl.textContent = gameInfo.name; // + "yoyoo what is gong on you guys"; // LOLGE remove
+
+    let ratingEl = gen("p");
+    let ratingValue = Number(gameInfo.steamRatingPercent);
+    if (ratingValue === 0) {
+      ratingEl.textContent = "No rating data";
+      ratingEl.classList.add("grey-text");
+    } else {
+      ratingEl.textContent = ratingValue + "% positive ratings";
+      if (ratingValue >= 75) {
+        ratingEl.classList.add("blue-text");
+      } else if (ratingValue >= 55) {
+        ratingEl.classList.add("yellow-text");
+      } else {
+        ratingEl.classList.add("red-text");
+      }
     }
-    cardElement.addEventListener("click", cardSelected);
-    return cardElement;
+
+    let storeEl = gen("div");
+    storeEl.classList.add("store-info");
+    let greyText = gen("p");
+    greyText.classList.add("grey-text");
+    greyText.textContent = "Best deal on ";
+    let storeName = gen("p");
+    storeName.textContent = STORES[Number(gameInfo.storeID) - 1];
+
+    let retailPrice = Number(gameInfo.retailPrice);
+    let salePrice = Number(gameInfo.salePrice);
+
+    let discountEl = gen("p");
+    let percent = 100 - Math.round((salePrice / retailPrice) * 100);
+    discountEl.textContent = "- " + percent + "%";
+    discountEl.classList.add("discount-text");
+
+    let priceEl = gen("div");
+    priceEl.classList.add("price-container");
+    let oldPrice = gen("p");
+    let newPrice = gen("p");
+    oldPrice.textContent = "$" + retailPrice;
+    newPrice.textContent = "$" + salePrice;
+    oldPrice.classList.add("old-price");
+    newPrice.classList.add("new-price");
+    
+    priceEl.appendChild(oldPrice);
+    priceEl.appendChild(newPrice);
+
+    storeEl.appendChild(greyText);
+    storeEl.appendChild(storeName);
+
+    infoEl.appendChild(titleEl);
+    infoEl.appendChild(ratingEl);
+    infoEl.appendChild(storeEl);
+
+    rowEl.appendChild(imgEl);
+    rowEl.appendChild(infoEl);
+    rowEl.appendChild(discountEl);
+    rowEl.appendChild(priceEl);
+    id("results").appendChild(rowEl);
+  }
+
+  function fetchAllDeals() {
+
+  }
+
+  function displayError() {
+    let errorEl = gen("p");
+    errorEl.textContent = "Error, couldn't load title.";
+    errorEl.classList.add("red-text");
+    id("results").appendChild(errorEl);
+  }
+  
+
+  /** from Lecture 14 */
+  async function statusCheck(response) {
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    return response;
   }
 
   /**

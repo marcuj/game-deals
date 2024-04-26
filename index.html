@@ -8,7 +8,7 @@
 -->
 <html lang="en">
   <head>
-    <title>Steam Lookup</title>
+    <title>Deal Lookup</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -16,20 +16,20 @@
   </head>
   <body>
     <header>
-      <h1>Steam Lookup</h1>
+      <h1>Deal Lookup</h1>
 
-      <button id="btn-see-all">See all deals</button>
+      <button id="btn-see-all">See all deals ></button>
 
-      <section id = search-bar>
+      <section id="search-bar">
         <input id="search-input" type="search" name="steam-search" placeholder="Search by title...">
-        <button id="btn-search">=></button>
+        <button id="btn-search">></button>
       </section>
 
     </header>
 
     <main>    
         
-      <section id="results">
+      <section id="results" class="hidden">
         <!-- appendChild rows of results w/ basic information
               TODO: allow click on item to expand or take to info page 
               - does new API call on gameID (has same endpoint though) 
