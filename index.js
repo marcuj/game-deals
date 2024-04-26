@@ -22,7 +22,7 @@
   "Noctre", "DreamGame"];
   const GOOD_TH = 75;
   const OK_TH = 55;
-  
+
   // "magic number"
   const HUN = 100;
 
@@ -83,19 +83,15 @@
 
   /**
    * Makes an API requrest to Cheap Shark API to get the game info of the game associated with the
-   * given deal ID.
+   * given deal ID. If error, it is caught by try/catch in fetchGames function.
    * @param {String} dealID - Cheap Shark API deal ID
    * @return {Object} - JSON object giving important info for the game associated with given deal ID
    */
   async function fetchGameInfo(dealID) {
-    // try {
     let response = await fetch(CHEAP_SHARK_URL + "deals?id=" + dealID);
     await statusCheck(response);
     let gameJson = await response.json();
     return gameJson;
-    // } catch (err) {
-    //   displayError();
-    // }
   }
 
   /**
